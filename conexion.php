@@ -1,7 +1,9 @@
 <?php
-$con = mysqli_connect("localhost", "root", "", "bd_biblioteca");
+$server = "localhost:3307"; $user = "root"; $pass = ""; $db = "bd_biblioteca";
 
-if (!$con) {
-    die("Error de conexión: " . mysqli_connect_error());
+$con = new mysqli($server, $user, $pass, $db);
+
+if ($con->connect_error) {
+    die("Error de conexión: " . $con->connect_error);
 }
 ?>

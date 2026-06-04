@@ -4,105 +4,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Usuarios</title>
+    <title>Gestion de Usuarios</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .form-control, .form-select, .btn, .modal-content, .badge {
-            border-radius: 0px;
-        }
-        .header-simple {
-            background-color: #004085;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        .header-link {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 18px;
-        }
-    </style>
 </head>
-<body class="bg-light">
+<body class="bg-dark bg-gradient text-dark">
 
-    <div class="header-simple">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-5">
         <div class="container">
-            <a class="header-link" href="../index.php">Inicio</a>
+            <a class="navbar-brand fw-bold" href="../index.php">📚 Sistema Gestion de Biblioteca</a>
+
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto bg-dark bg-gradient text-white p-2 rounded">
+                    <li class="nav-item"><a class="nav-link" href="../index.php">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../libros/lista.php">Libros</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="lista.php">Usuarios</a></li>
+                </ul>
+            </div>
+
         </div>
-    </div>
+    </nav>
 
     <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-            <h2>Lista de Usuarios</h2>
-            <button type="button" class="btn btn-primary" style="background-color: #004085; border-color: #004085;" data-bs-toggle="modal" data-bs-target="#modalUsuario" onclick="limpiarFormulario()">
-                Registrar Nuevo Usuario
+        <div class="d-flex justify-content-between align-items-center mb-5 bg-white mb-4 p-4 rounded shadow-sm">
+            <h2 class="display-5 fw-bold" style="color: #343a40;">Lista de Usuarios</h2>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalUsuario" onclick="limpiarFormulario()">
+                + Registrar Nuevo Usuario
             </button>
         </div>
 
-        <table class="table table-bordered bg-white">
-            <thead style="background-color: #004085; color: white;">
-                <tr>
-                    <th>Nombre Completo</th>
-                    <th>Carnet Identidad</th>
-                    <th>Teléfono</th>
-                    <th>Correo Electrónico</th>
-                    <th class="text-center">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $resultado = mysqli_query($con, "SELECT * FROM usuarios ORDER BY id DESC");
-                if (mysqli_num_rows($resultado) > 0) {
-                    while($row = mysqli_fetch_assoc($resultado)) {
-                        echo "<tr id='fila-usuario-".$row['id']."'>";
-                        echo "<td><strong>".$row['nombre']."</strong></td>";
-                        echo "<td>".$row['carnet']."</td>";
-                        echo "<td>".$row['telefono']."</td>";
-                        echo "<td>".$row['correo']."</td>";
-                        echo "<td class='text-center'>
-                                <button class='btn btn-sm btn-primary me-2' onclick='editarUsuario(".$row['id'].")'>Editar</button>
-                                <button class='btn btn-sm btn-danger' onclick='eliminarUsuario(".$row['id'].")'>Eliminar</button>
-                            </td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='5' class='text-center p-4 text-muted'>No existen usuarios registrados.</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="text-center">Nombre Completo</th>
+                            <th class="text-center">Carnet Identidad</th>
+                            <th class="text-center">Telefono</th>
+                            <th class="text-center">Correo Electronico</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $resultado = $con->query("SELECT * FROM usuarios ORDER BY id DESC");
+                        if ($resultado->num_rows > 0) {
+                            while($row = $resultado->fetch_assoc()) {
+                                echo "<tr id='fila-usuario-{$row['id']}'>";
+                                echo "<td class='text-center'><strong>".$row['nombre']."</strong></td>";
+                                echo "<td class='text-center'><strong>".$row['carnet']."</strong></td>";
+                                echo "<td class='text-center'><strong>".$row['telefono']."</strong></td>";
+                                echo "<td class='text-center'><strong>".$row['correo']."</strong></td>";
+                                echo "<td class='text-center'>
+                                        <button class='btn btn-sm btn-warning me-2' onclick='editarUsuario({$row['id']})'>Editar</button>
+                                        <button class='btn btn-sm btn-danger' onclick='eliminarUsuario({$row['id']})'>Eliminar</button>
+                                    </td>";
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='5' class='text-center p-4 text-muted'>No existen usuarios registrados.</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <div class="modal fade" id="modalUsuario" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form id="formUsuario" onsubmit="guardarUsuario(event)">
-                    <div class="modal-header text-white" style="background-color: #004085;">
+                    <div class="modal-header bg-dark text-white">
                         <h5 class="modal-title" id="modalTitulo">Registrar Usuario</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <input type="hidden" id="id" name="id">
                         <div class="mb-3">
-                            <label class="form-label">Nombre Completo *</label>
+                            <label class="form-label fw-bold">Nombre Completo *</label>
                             <input type="text" id="nombre" name="nombre" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Carnet de Identidad *</label>
+                            <label class="form-label fw-bold">Carnet de Identidad *</label>
                             <input type="text" id="carnet" name="carnet" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Teléfono</label>
+                            <label class="form-label fw-bold">Telefono</label>
                             <input type="text" id="telefono" name="telefono" class="form-control">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Correo Electrónico</label>
+                            <label class="form-label fw-bold">Correo Electronico</label>
                             <input type="email" id="correo" name="correo" class="form-control">
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary" style="background-color: #004085; border-color: #004085;">Guardar Usuario</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" id="btnSubmitUsuario" class="btn btn-success">Registrar Usuario</button>
                     </div>
                 </form>
             </div>
@@ -110,6 +107,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../JavaScript/usuarios.js"></script>
+    <script src="../Javascript/usuarios.js"></script>
 </body>
 </html>

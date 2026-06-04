@@ -6,12 +6,17 @@ $response = array('status' => 'error', 'mensaje' => 'No se pudo eliminar.');
 
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
-    $sql = "DELETE FROM usuarios WHERE id = $id";
-    if (mysqli_query($con, $sql)) {
-        $response['status'] = 'ok';
-        $response['mensaje'] = 'Usuario eliminado correctamente';
-    } else {
-        $response['mensaje'] = 'No se puede eliminar: ' . mysqli_error($con);
+    try {
+        $sql = "DELETE FROM usuarios WHERE id = ?";
+        $stmt = $con->prepare($sql);
+        $stmt->bind_param("i", $id);
+        if ($stmt->execute()) {
+            $response['status'] = 'ok';
+            $response['mensaje'] = 'Usuario eliminado correctamente';
+        }
+        $stmt->close();
+    } catch (Exception $e) {
+        $response['mensaje'] = 'No se puede eliminar: ' . $e->getMessage();
     }
 }
 echo json_encode($response);

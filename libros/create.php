@@ -2,27 +2,42 @@
 include('../conexion.php');
 header('Content-Type: application/json');
 
-$response = array('status' => 'error', 'mensaje' => 'Ocurrió un error.');
+$response = array('status' => 'error', 'mensaje' => 'Ocurrio un error inesperado.');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $titulo = isset($_POST['titulo']) ? $_POST['titulo'] : '';
-    $autor = isset($_POST['autor']) ? $_POST['autor'] : '';
-    $isbn = isset($_POST['isbn']) ? $_POST['isbn'] : '';
-    $categoria = isset($_POST['categoria']) ? $_POST['categoria'] : '';
+    $titulo = isset($_POST['titulo']) ? trim($_POST['titulo']) : '';
+    $autor = isset($_POST['autor']) ? trim($_POST['autor']) : '';
+    $isbn = isset($_POST['isbn']) ? trim($_POST['isbn']) : null;
+    $categoria = isset($_POST['categoria']) ? trim($_POST['categoria']) : null;
     $stock = isset($_POST['stock']) ? intval($_POST['stock']) : 0;
 
     if ($titulo == '' || $autor == '') {
         $response['mensaje'] = 'El título y el autor son campos obligatorios.';
-    } elseif ($stock < 0) {
+        echo json_encode($response);
+        exit;
+    }
+
+    
+    if ($stock < 0) {
         $response['mensaje'] = 'El stock disponible no puede ser negativo.';
-    } else {
-        $sql = "INSERT INTO libros (titulo, autor, isbn, categoria, stock) VALUES ('$titulo', '$autor', '$isbn', '$categoria', $stock)";
-        if (mysqli_query($con, $sql)) {
+        echo json_encode($response);
+        exit;
+    }
+
+    try {
+        $sql = "INSERT INTO libros (titulo, autor, isbn, categoria, stock) VALUES (?, ?, ?, ?, ?)";
+        $stmt = $con->prepare($sql);
+        $stmt->bind_param("ssssi", $titulo, $autor, $isbn, $categoria, $stock);
+
+        if ($stmt->execute()) {
             $response['status'] = 'ok';
             $response['mensaje'] = 'Libro registrado correctamente';
         } else {
-            $response['mensaje'] = 'Error al insertar: ' . mysqli_error($con);
+            $response['mensaje'] = 'Error al insertar: ' . $stmt->error;
         }
+        $stmt->close();
+    } catch (Exception $e) {
+        $response['mensaje'] = 'Error en base de datos: ' . $e->getMessage();
     }
 }
 echo json_encode($response);

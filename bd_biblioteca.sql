@@ -1,9 +1,6 @@
 CREATE DATABASE IF NOT EXISTS bd_biblioteca;
 USE bd_biblioteca;
 
-DROP TABLE IF EXISTS usuarios;
-DROP TABLE IF EXISTS libros;
-
 CREATE TABLE libros (
     id INT PRIMARY KEY AUTO_INCREMENT,
     titulo VARCHAR(200) NOT NULL,
@@ -22,13 +19,13 @@ CREATE TABLE usuarios (
 );
 
 CREATE TABLE prestamos (
-id INT PRIMARY KEY AUTO_INCREMENT,
-id_libro INT NOT NULL,
-id_usuario INT NOT NULL,
-fecha_prestamo DATE NOT NULL,
-fecha_devolucion DATE,
-estado ENUM('Activo','Devuelto','Vencido') DEFAULT 'Activo',
-observaciones TEXT,
-FOREIGN KEY (id_libro) REFERENCES libros(id),
-FOREIGN KEY (id_usuario) REFERENCES usuarios(id)
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_libro INT NOT NULL,
+    id_usuario INT NOT NULL,
+    fecha_prestamo DATE NOT NULL,
+    fecha_devolucion DATE,
+    estado ENUM ('Activo', 'Devuelto', 'Vencido') DEFAULT 'Activo',
+    observaciones TEXT,
+    FOREIGN KEY (id_libro) REFERENCES libros (id),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios (id)
 );
